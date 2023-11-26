@@ -1,6 +1,8 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type DT struct {
 	UnixSecs int
@@ -40,9 +42,35 @@ func (d *DT) Now() *DT {
 	return d
 }
 
-func (d *DT) String() string {
+func (d *DT) InDays(days int) bool {
+	t := d.asTime()
+	tStartOfDay := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+
+	today := time.Now()
+	todayStartOfDay := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, time.UTC)
+
+	provTime := todayStartOfDay.Add(time.Duration(days * 24 * int(time.Hour)))
+
+	// fmt.Printf("%s %s\n", todayStartOfDay.Format(time.DateTime), provTime.Format(time.DateTime))
+
+	if provTime.After(tStartOfDay) || provTime.Equal(tStartOfDay) {
+		return true
+	}
+
+	return false
+}
+
+func (d *DT) ShortString() string {
 	if d.HasError {
 		return "INVALID TIME"
 	}
-	return d.asTime().Format(time.DateTime)
+	return d.asTime().Format("Mon 02 Jan")
+}
+
+func (d *DT) LongString() string {
+	if d.HasError {
+		return "INVALID TIME"
+	}
+	return d.asTime().Format("Mon 02 Jan at 15:04")
+
 }

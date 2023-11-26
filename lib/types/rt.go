@@ -10,6 +10,8 @@ import (
 	"github.com/lspaccatrosi16/go-cli-tools/gbin"
 )
 
+const APP_NAME = "MotionTui"
+
 const REQ_LIMIT = 6
 
 type RT struct {
@@ -96,7 +98,7 @@ func (r *RT) Save() error {
 }
 
 func cpath() (string, error) {
-	base, err := config.GetConfigPath("motionTui")
+	base, err := config.GetConfigPath(APP_NAME)
 	if err != nil {
 		return "", err
 	}

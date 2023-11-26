@@ -1,30 +1,34 @@
 package main
 
 import (
-	"fmt"
+	"strconv"
 
-	"github.com/lspaccatrosi16/motion-tui/lib/types"
+	"github.com/lspaccatrosi16/go-cli-tools/input"
+	"github.com/lspaccatrosi16/motion-tui/lib/data"
+	"github.com/lspaccatrosi16/motion-tui/lib/display"
 )
 
 func main() {
-	rt := new(types.RT)
-	err := rt.Load()
+	dayStr := input.GetInput("Days to get schedule for")
+
+	days, err := strconv.Atoi(dayStr)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Num Requests: %d\n", rt.NumRequests())
-	fmt.Printf("Can request: %t\n", rt.CanRequest())
-	if rt.CanRequest() {
-		rt.LogRequest()
-	}
+	err = data.GetList(days)
 
-	fmt.Printf("Num Requests: %d\n", rt.NumRequests())
-
-	err = rt.Save()
 	if err != nil {
 		panic(err)
 	}
-	// manager := command.NewManager(command.ManagerConfig{Searchable: true})
-	// manager.Tui()
+
+	err = display.DisplayData()
+	if err != nil {
+		panic(err)
+	}
+
+	// for _, task := range appData.Tasks {
+	// 	fmt.Println(task.String())
+	// }
+
 }
