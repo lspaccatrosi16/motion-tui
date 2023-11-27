@@ -18,7 +18,8 @@ type taskTree struct {
 	Task *types.Task
 }
 
-type dayMap map[int]*[]taskTree
+type intTreeMap map[int]*[]taskTree
+type stringTreeMap map[string]*[]taskTree
 
 type dayTasks struct {
 	Date  types.DT
@@ -39,6 +40,25 @@ func (d dayList) Less(i, j int) bool {
 	return d[i].Date.UnixSecs < d[j].Date.UnixSecs
 }
 
+type projTasks struct {
+	Name  string
+	Tasks []taskTree
+}
+
+type projList []projTasks
+
+func (p projList) Len() int {
+	return len(p)
+}
+
+func (p projList) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+func (p projList) Less(i, j int) bool {
+	return p[i].Name < p[j].Name
+}
+
 func DisplayData() error {
 	appData, err := types.GetAppData()
 	if err != nil {
@@ -54,10 +74,11 @@ func DisplayData() error {
 
 	tasksTree := makeTasksTree(baseTrees)
 	daysTree := makeDaysTree(baseTrees)
+	projectsTree := makeProjectsTree(baseTrees)
 
 	gui := panels.MakeGui(panels.GuiData{
 		MenuItems: items,
-		DataViews: []*panels.DataTree{tasksTree, daysTree},
+		DataViews: []*panels.DataTree{tasksTree, daysTree, projectsTree},
 	})
 
 	gui.Run()
@@ -113,7 +134,7 @@ func makeTasksTree(baseTrees []taskTree) *panels.DataTree {
 func makeDaysTree(baseTrees []taskTree) *panels.DataTree {
 	tree := panels.NewDataTree("Days")
 
-	daySortedMap := dayMap{}
+	daySortedMap := intTreeMap{}
 
 	for _, bt := range baseTrees {
 		key := time.Unix(int64(bt.Task.Start.UnixSecs), 0).YearDay()
@@ -144,6 +165,41 @@ func makeDaysTree(baseTrees []taskTree) *panels.DataTree {
 		dayTree := tree.AddChild(day.Date.ShortString())
 		for _, task := range day.Tasks {
 			dayTree.InheritTree(task.Tree)
+		}
+	}
+
+	return tree
+}
+
+func makeProjectsTree(baseTrees []taskTree) *panels.DataTree {
+	tree := panels.NewDataTree("Projects")
+	projTrees := stringTreeMap{}
+
+	for _, bt := range baseTrees {
+		key := bt.Task.Project.Name
+		aPtr := projTrees[key]
+
+		arr := []taskTree{}
+
+		if aPtr != nil {
+			arr = *aPtr
+		}
+
+		arr = append(arr, bt)
+		projTrees[key] = &arr
+	}
+
+	list := projList{}
+
+	for k, v := range projTrees {
+		list = append(list, projTasks{Name: k, Tasks: *v})
+	}
+
+	for _, el := range list {
+		proj := tree.AddChild(el.Name)
+
+		for _, t := range el.Tasks {
+			proj.InheritTree(t.Tree)
 		}
 	}
 

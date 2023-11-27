@@ -1,13 +1,20 @@
 package data
 
-type reqTask struct {
+type reqProject struct {
 	Id          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	Due         string `json:"dueDate"`
-	Start       string `json:"scheduledStart"`
-	End         string `json:"scheduledEnd"`
-	Priority    string `json:"priority"`
+}
+
+type reqTask struct {
+	Id          string     `json:"id"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Due         string     `json:"dueDate"`
+	Start       string     `json:"scheduledStart"`
+	End         string     `json:"scheduledEnd"`
+	Priority    string     `json:"priority"`
+	Project     reqProject `json:"project"`
 }
 
 type reqTaskList struct {

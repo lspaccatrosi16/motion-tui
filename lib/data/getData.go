@@ -41,6 +41,16 @@ func GetList(days int) error {
 				priority = types.LOW
 			}
 
+			var project types.Project
+
+			if rawTask.Project.Name != "" {
+				project.Name = rawTask.Project.Name
+				project.Description = rawTask.Project.Description
+				project.Id = rawTask.Project.Id
+			} else {
+				project.Name = "No Project"
+			}
+
 			task := types.Task{
 				Start:       *start,
 				End:         *end,
@@ -49,6 +59,7 @@ func GetList(days int) error {
 				Description: rawTask.Description,
 				Priority:    priority,
 				Id:          rawTask.Id,
+				Project:     project,
 			}
 
 			if task.Start.InDays(days) && !start.HasError && !end.HasError {

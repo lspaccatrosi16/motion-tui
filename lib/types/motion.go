@@ -31,6 +31,12 @@ func (t TaskPriority) String() string {
 	}
 }
 
+type Project struct {
+	Id          string
+	Name        string
+	Description string
+}
+
 type Task struct {
 	Start       DT
 	End         DT
@@ -39,6 +45,7 @@ type Task struct {
 	Description string
 	Priority    TaskPriority
 	Id          string
+	Project     Project
 }
 
 func (t *Task) String() string {
